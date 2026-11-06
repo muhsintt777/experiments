@@ -52,8 +52,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final from = CurrencyConverter.currencies[_fromCurrency]!;
-    final to = CurrencyConverter.currencies[_toCurrency]!;
     final rate = CurrencyConverter.rate(
       fromCode: _fromCurrency,
       toCode: _toCurrency,
@@ -130,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       children: [
                         ConversionResult(
                           amount: _convertedAmount,
-                          currencySymbol: to.symbol,
+                          currencyCode: _toCurrency,
                         ),
                         const SizedBox(height: 22),
                         CurrencyPairSelector(
@@ -150,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         const SizedBox(height: 18),
                         AmountInput(
                           controller: _amountController,
-                          currencySymbol: from.symbol,
+                          currencyCode: _fromCurrency,
                           onChanged: (_) => setState(() {
                             _convertedAmount = null;
                           }),

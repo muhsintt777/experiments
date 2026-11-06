@@ -5,12 +5,12 @@ class AmountInput extends StatelessWidget {
   const AmountInput({
     super.key,
     required this.controller,
-    required this.currencySymbol,
+    required this.currencyCode,
     required this.onChanged,
   });
 
   final TextEditingController controller;
-  final String currencySymbol;
+  final String currencyCode;
   final ValueChanged<String> onChanged;
 
   @override
@@ -28,28 +28,51 @@ class AmountInput extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        TextField(
-          key: const Key('amount-input'),
-          controller: controller,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
-          ],
-          onChanged: onChanged,
-          style: const TextStyle(
-            color: Color(0xFF182B27),
-            fontSize: 32,
-            fontWeight: FontWeight.w600,
-          ),
-          decoration: InputDecoration(
-            hintText: '0.00',
-            prefixText: '$currencySymbol ',
-            prefixStyle: const TextStyle(
-              color: Color(0xFF82908A),
-              fontSize: 28,
-            ),
-            border: InputBorder.none,
-            contentPadding: EdgeInsets.zero,
+        SizedBox(
+          height: 60,
+          child: Row(
+            children: [
+              SizedBox(
+                width: 45,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    currencyCode,
+                    style: const TextStyle(
+                      color: Color(0xFF82908A),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: TextField(
+                  key: const Key('amount-input'),
+                  controller: controller,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^\d*\.?\d{0,2}'),
+                    ),
+                  ],
+                  onChanged: onChanged,
+                  textAlignVertical: TextAlignVertical.center,
+                  style: const TextStyle(
+                    color: Color(0xFF182B27),
+                    fontSize: 32,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  decoration: const InputDecoration(
+                    hintText: '0.00',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],

@@ -4,11 +4,11 @@ class ConversionResult extends StatelessWidget {
   const ConversionResult({
     super.key,
     required this.amount,
-    required this.currencySymbol,
+    required this.currencyCode,
   });
 
   final double? amount;
-  final String currencySymbol;
+  final String currencyCode;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class ConversionResult extends StatelessWidget {
                   child: Text(
                     amount == null
                         ? '--'
-                        : '$currencySymbol ${amount!.toStringAsFixed(2)}',
+                        : '$currencyCode ${amount!.toStringAsFixed(2)}',
                     style: const TextStyle(
                       color: Color(0xFF176B5B),
                       fontSize: 30,

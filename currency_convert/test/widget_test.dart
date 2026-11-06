@@ -11,20 +11,29 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:currency_convert/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  testWidgets('converts an amount using the selected currencies', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    await tester.enterText(find.byKey(const Key('amount-input')), '10');
+    final convertButton = find.widgetWithText(FilledButton, 'Convert');
+    await tester.ensureVisible(convertButton);
+    await tester.tap(convertButton);
+    await tester.pumpAndSettle();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    expect(find.text('د.إ 36.73'), findsOneWidget);
+    expect(find.byKey(const Key('conversion-result')), findsOneWidget);
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('amount input allows no more than two decimal places', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MyApp());
+    final input = find.byKey(const Key('amount-input'));
+
+    await tester.enterText(input, '12.345');
+
+    expect(tester.widget<TextField>(input).controller!.text, '12.34');
   });
 }

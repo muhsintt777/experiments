@@ -11,9 +11,6 @@
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
 
-    // Draw a guide line at 80 characters, where Dart's formatting will wrap code.
-    "editor.rulers": [80],
-
     // Disables built-in highlighting of words that match your selection. Without
     // this, all instances of the selected text will be highlighted, interfering
     // with Dart's ability to highlight only exact references to the selected variable.

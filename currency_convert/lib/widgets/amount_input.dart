@@ -19,7 +19,7 @@ class AmountInput extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const Text(
-          'AMOUNT',
+          'ENTER AMOUNT',
           style: TextStyle(
             color: Color(0xFF78847F),
             fontSize: 11,

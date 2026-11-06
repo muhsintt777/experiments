@@ -128,14 +128,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        AmountInput(
-                          controller: _amountController,
-                          currencySymbol: from.symbol,
-                          onChanged: (_) => setState(() {
-                            _convertedAmount = null;
-                          }),
+                        ConversionResult(
+                          amount: _convertedAmount,
+                          currencySymbol: to.symbol,
                         ),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 22),
                         CurrencyPairSelector(
                           currencies: CurrencyConverter.currencies,
                           fromCode: _fromCurrency,
@@ -150,15 +147,16 @@ class _MyHomePageState extends State<MyHomePage> {
                           }),
                           onSwap: _swapCurrencies,
                         ),
+                        const SizedBox(height: 18),
+                        AmountInput(
+                          controller: _amountController,
+                          currencySymbol: from.symbol,
+                          onChanged: (_) => setState(() {
+                            _convertedAmount = null;
+                          }),
+                        ),
                         const SizedBox(height: 20),
                         ConvertButton(onPressed: _convert),
-                        if (_convertedAmount != null) ...[
-                          const SizedBox(height: 22),
-                          ConversionResult(
-                            amount: _convertedAmount!,
-                            currencySymbol: to.symbol,
-                          ),
-                        ],
                       ],
                     ),
                   ),

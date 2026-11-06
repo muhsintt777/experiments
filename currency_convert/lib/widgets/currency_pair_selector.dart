@@ -23,32 +23,32 @@ class CurrencyPairSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        CurrencyPicker(
-          label: 'FROM',
-          value: fromCode,
-          currencies: currencies,
-          onChanged: onFromChanged,
-        ),
-        Align(
-          heightFactor: 1,
-          child: IconButton.filledTonal(
-            key: const Key('swap-currencies'),
-            tooltip: 'Swap currencies',
-            onPressed: onSwap,
-            icon: const Icon(Icons.swap_vert_rounded),
-            style: IconButton.styleFrom(
-              backgroundColor: const Color(0xFFEAF2EE),
-              foregroundColor: const Color(0xFF176B5B),
-            ),
+        Expanded(
+          child: CurrencyPicker(
+            value: fromCode,
+            currencies: currencies,
+            onChanged: onFromChanged,
           ),
         ),
-        CurrencyPicker(
-          label: 'TO',
-          value: toCode,
-          currencies: currencies,
-          onChanged: onToChanged,
+        IconButton.filledTonal(
+          key: const Key('swap-currencies'),
+          tooltip: 'Swap currencies',
+          onPressed: onSwap,
+          icon: const Icon(Icons.swap_horiz_rounded),
+          style: IconButton.styleFrom(
+            backgroundColor: const Color(0xFFEAF2EE),
+            foregroundColor: const Color(0xFF176B5B),
+          ),
+        ),
+        Expanded(
+          child: CurrencyPicker(
+            value: toCode,
+            currencies: currencies,
+            onChanged: onToChanged,
+          ),
         ),
       ],
     );

@@ -2,6 +2,7 @@
 
 - Dont over engineer
 - Ignore test cases
+- Follow modular architecture
 
 ### Git
 

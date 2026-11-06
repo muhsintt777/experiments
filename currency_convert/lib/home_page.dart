@@ -15,9 +15,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _amountController = TextEditingController();
-  String _fromCurrency = 'USD';
-  String _toCurrency = 'AED';
+  String _fromCurrency = 'AED';
+  String _toCurrency = 'INR';
   double? _convertedAmount;
+  double? _rate;
+  String? _rateDate;
+  bool _isLoadingRate = false;
+  String? _rateError;
+  int _rateRequestId = 0;
 
   @override
   void dispose() {
@@ -25,20 +30,51 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  void _convert() {
+  Future<void> _convert() async {
     final amount = double.tryParse(_amountController.text);
     if (amount == null || amount <= 0) {
-      setState(() => _convertedAmount = null);
+      setState(() {
+        _convertedAmount = null;
+        _rateError = 'Enter an amount greater than zero';
+      });
       return;
     }
 
+    final requestId = ++_rateRequestId;
     setState(() {
-      _convertedAmount = CurrencyConverter.convert(
-        amount: amount,
+      _isLoadingRate = true;
+      _convertedAmount = null;
+      _rateError = null;
+    });
+
+    try {
+      final rate = await CurrencyConverter.rate(
         fromCode: _fromCurrency,
         toCode: _toCurrency,
       );
-    });
+      if (!mounted || requestId != _rateRequestId) return;
+      setState(() {
+        _rate = rate.value;
+        _rateDate = rate.date;
+        _convertedAmount = amount * rate.value;
+        _isLoadingRate = false;
+      });
+    } catch (_) {
+      if (!mounted || requestId != _rateRequestId) return;
+      setState(() {
+        _isLoadingRate = false;
+        _rateError = 'Could not load the latest rate';
+      });
+    }
+  }
+
+  void _clearConversion() {
+    _rateRequestId++;
+    _rate = null;
+    _rateDate = null;
+    _convertedAmount = null;
+    _isLoadingRate = false;
+    _rateError = null;
   }
 
   void _swapCurrencies() {
@@ -46,17 +82,12 @@ class _MyHomePageState extends State<MyHomePage> {
       final previousFrom = _fromCurrency;
       _fromCurrency = _toCurrency;
       _toCurrency = previousFrom;
-      _convertedAmount = null;
+      _clearConversion();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final rate = CurrencyConverter.rate(
-      fromCode: _fromCurrency,
-      toCode: _toCurrency,
-    );
-
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -135,14 +166,18 @@ class _MyHomePageState extends State<MyHomePage> {
                           currencies: CurrencyConverter.currencies,
                           fromCode: _fromCurrency,
                           toCode: _toCurrency,
-                          onFromChanged: (value) => setState(() {
-                            _fromCurrency = value;
-                            _convertedAmount = null;
-                          }),
-                          onToChanged: (value) => setState(() {
-                            _toCurrency = value;
-                            _convertedAmount = null;
-                          }),
+                          onFromChanged: (value) {
+                            setState(() {
+                              _fromCurrency = value;
+                              _clearConversion();
+                            });
+                          },
+                          onToChanged: (value) {
+                            setState(() {
+                              _toCurrency = value;
+                              _clearConversion();
+                            });
+                          },
                           onSwap: _swapCurrencies,
                         ),
                         const SizedBox(height: 18),
@@ -154,13 +189,20 @@ class _MyHomePageState extends State<MyHomePage> {
                           }),
                         ),
                         const SizedBox(height: 20),
-                        ConvertButton(onPressed: _convert),
+                        ConvertButton(
+                          onPressed: _isLoadingRate ? null : _convert,
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    '1 $_fromCurrency = ${rate.toStringAsFixed(4)} $_toCurrency  ·  Indicative rates',
+                    _isLoadingRate
+                        ? 'Fetching latest rate...'
+                        : _rateError ??
+                              (_rate == null
+                                  ? 'Press Convert to load the rate'
+                                  : '1 $_fromCurrency = ${_rate!.toStringAsFixed(4)} $_toCurrency  ·  Rate date: $_rateDate'),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Color(0xFF78847F),

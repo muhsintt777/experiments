@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'currency_converter.dart';
+import 'widgets/amount_input.dart';
 import 'widgets/convert_button.dart';
-import 'widgets/currency_picker.dart';
+import 'widgets/conversion_result.dart';
+import 'widgets/currency_pair_selector.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -127,112 +128,35 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text(
-                          'AMOUNT',
-                          style: TextStyle(
-                            color: Color(0xFF78847F),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          key: const Key('amount-input'),
+                        AmountInput(
                           controller: _amountController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d{0,2}'),
-                            ),
-                          ],
+                          currencySymbol: from.symbol,
                           onChanged: (_) => setState(() {
                             _convertedAmount = null;
                           }),
-                          style: const TextStyle(
-                            color: Color(0xFF182B27),
-                            fontSize: 32,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: '0.00',
-                            prefixText: '${from.symbol} ',
-                            prefixStyle: const TextStyle(
-                              color: Color(0xFF82908A),
-                              fontSize: 28,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.zero,
-                          ),
                         ),
                         const SizedBox(height: 18),
-                        CurrencyPicker(
-                          label: 'FROM',
-                          value: _fromCurrency,
+                        CurrencyPairSelector(
                           currencies: CurrencyConverter.currencies,
-                          onChanged: (value) => setState(() {
+                          fromCode: _fromCurrency,
+                          toCode: _toCurrency,
+                          onFromChanged: (value) => setState(() {
                             _fromCurrency = value;
                             _convertedAmount = null;
                           }),
-                        ),
-                        Align(
-                          heightFactor: 1,
-                          child: IconButton.filledTonal(
-                            key: const Key('swap-currencies'),
-                            tooltip: 'Swap currencies',
-                            onPressed: _swapCurrencies,
-                            icon: const Icon(Icons.swap_vert_rounded),
-                            style: IconButton.styleFrom(
-                              backgroundColor: const Color(0xFFEAF2EE),
-                              foregroundColor: const Color(0xFF176B5B),
-                            ),
-                          ),
-                        ),
-                        CurrencyPicker(
-                          label: 'TO',
-                          value: _toCurrency,
-                          currencies: CurrencyConverter.currencies,
-                          onChanged: (value) => setState(() {
+                          onToChanged: (value) => setState(() {
                             _toCurrency = value;
                             _convertedAmount = null;
                           }),
+                          onSwap: _swapCurrencies,
                         ),
                         const SizedBox(height: 20),
                         ConvertButton(onPressed: _convert),
                         if (_convertedAmount != null) ...[
                           const SizedBox(height: 22),
-                          Container(
-                            key: const Key('conversion-result'),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF1F6F2),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'YOU RECEIVE',
-                                  style: TextStyle(
-                                    color: Color(0xFF6D7B76),
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 1.1,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  '${to.symbol} ${_convertedAmount!.toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    color: Color(0xFF176B5B),
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          ConversionResult(
+                            amount: _convertedAmount!,
+                            currencySymbol: to.symbol,
                           ),
                         ],
                       ],
